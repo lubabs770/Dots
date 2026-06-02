@@ -2,6 +2,8 @@
 
 My macOS dotfiles (alacritty, btop, nvim, yabai, skhd, yazi, zed, zsh, iTerm2, VS Code, Homebrew Brewfile).
 
+see [my sunshine project](https://github.com/lubabs770/Sunshine) i use this with side by side
+
 ## Install
 
 On a fresh machine:
