@@ -1,0 +1,130 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "autosave": "on_focus_change",
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry"
+    }
+  },
+  "context_servers": {
+    "mcp-server-context7": {
+      "enabled": true,
+      "remote": false,
+      "settings": {
+        "context7_api_key": ""
+      }
+    }
+  },
+  "cli_default_open_behavior": "new_window",
+  "ui_font_family": ".SystemUIFont",
+  "buffer_line_height": "comfortable",
+  "buffer_font_family": "JetBrainsMonoNL Nerd Font Mono",
+  "diff_view_style": "split",
+  "go_to_definition_scroll_strategy": "top",
+  "proxy": "",
+  "minimap": {
+    "show": "always"
+  },
+  "terminal": {
+    "cursor_shape": "bar",
+    "shell": "system",
+    "dock": "bottom",
+    "toolbar": {
+      "breadcrumbs": false
+    },
+    "font_family": "JetBrainsMonoNL Nerd Font Propo"
+  },
+  "project_panel": {
+    "sort_order": "default",
+    "auto_reveal_entries": false,
+    "indent_size": 15.0,
+    "hide_root": false,
+    "sticky_scroll": true,
+    "indent_guides": {
+      "show": "always"
+    },
+    "git_status_indicator": false,
+    "diagnostic_badges": false,
+    "scrollbar": {
+      "horizontal_scroll": true,
+      "show": "auto"
+    },
+    "auto_fold_dirs": true,
+    "bold_folder_labels": false,
+    "git_status": true,
+    "folder_icons": true,
+    "entry_spacing": "standard",
+    "dock": "right"
+  },
+  "outline_panel": {
+    "dock": "right"
+  },
+  "collaboration_panel": {
+    "dock": "right"
+  },
+  "agent": {
+    "default_profile": "do",
+    "profiles": {
+      "do": {
+        "name": "do",
+        "tools": {
+          "write_file": true,
+          "terminal": true,
+          "update_plan": true,
+          "spawn_agent": true,
+          "skill": true,
+          "rename_symbol": true,
+          "read_file": true,
+          "move_path": true,
+          "list_directory": true,
+          "grep": true,
+          "go_to_definition": true,
+          "get_code_actions": true,
+          "find_references": true,
+          "find_path": true,
+          "fetch": true,
+          "edit_file": true,
+          "diagnostics": true,
+          "delete_path": true,
+          "create_directory": true,
+          "copy_path": true,
+          "apply_code_action": true
+        },
+        "enable_all_context_servers": false,
+        "context_servers": {}
+      }
+    },
+    "default_model": {
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-6",
+      "enable_thinking": true,
+      "effort": "high"
+    },
+    "dock": "left",
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "git_panel": {
+    "tree_view": false,
+    "dock": "right"
+  },
+  "icon_theme": "VSCode Icons for Zed (Light)",
+  "vim_mode": true,
+  "session": {
+    "trust_all_worktrees": true
+  },
+  "ui_font_size": 14.0,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Catppuccin Frappé",
+  },
+}

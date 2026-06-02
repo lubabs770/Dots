@@ -1,0 +1,333 @@
+#!/usr/bin/env bash
+# sunshine-bootstrap — one-shot machine setup for the sunshine theme switcher
+# idempotent: safe to re-run
+
+set -uo pipefail
+
+ok()   { printf '\033[32m  ✓ %s\033[0m\n' "$*"; }
+warn() { printf '\033[33m  ⚠ %s\033[0m\n' "$*"; }
+step() { printf '\n\033[1;36m▸ %s\033[0m\n' "$*"; }
+
+BTOP_THEMES_DIR="$HOME/.config/btop/themes"
+YAZI_FLAVORS_DIR="$HOME/.config/yazi/flavors"
+ALACRITTY_THEMES_DIR="$HOME/.config/alacritty/themes"
+ITERM_PRESETS_DIR="$HOME/.config/sunshine-iterm-presets"
+mkdir -p "$ITERM_PRESETS_DIR"
+
+# ── 1. Homebrew ───────────────────────────────────────────────────────────────
+
+step "Homebrew"
+command -v brew &>/dev/null \
+    || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+ok "brew"
+
+# ── 2. Core dependencies ──────────────────────────────────────────────────────
+
+step "Core dependencies"
+for _pkg in gum figlet; do
+    brew list "$_pkg" &>/dev/null || brew install "$_pkg"
+    ok "$_pkg"
+done
+
+# ── 3. Apps ───────────────────────────────────────────────────────────────────
+
+step "Apps"
+
+_brew() {
+    local pkg="$1" label="${2:-$1}"
+    if brew list "$pkg" &>/dev/null; then
+        ok "$label (already installed)"
+    else
+        brew install "$pkg" && ok "$label" || warn "$label — install failed"
+    fi
+}
+
+_cask() {
+    local pkg="$1" label="${2:-$1}" app="${3:-}"
+    if brew list --cask "$pkg" &>/dev/null; then
+        ok "$label (already installed)"
+    elif [ -n "$app" ] && [ -d "/Applications/$app" ]; then
+        ok "$label (already installed, not brew-managed)"
+    else
+        brew install --cask "$pkg" && ok "$label" || warn "$label — install failed"
+    fi
+}
+
+_brew "felixkratz/formulae/borders" "borders"
+_brew "btop"
+_brew "neofetch"
+_brew "neovim"
+_brew "yazi"
+_cask "ubersicht"           "Übersicht"   "Übersicht.app"
+_cask "iterm2"              "iTerm2"      "iTerm.app"
+_cask "visual-studio-code"  "VS Code"     "Visual Studio Code.app"
+_cask "zed"                 "Zed"         "Zed.app"
+_cask "alacritty"           "Alacritty"   "Alacritty.app"
+
+# ── 4. VS Code theme extensions ───────────────────────────────────────────────
+
+step "VS Code theme extensions"
+
+if command -v code &>/dev/null; then
+    _vscode_exts=(
+        arcticicestudio.nord-visual-studio-code
+        enkia.tokyo-night
+        jdinhlife.gruvbox
+        mvllow.rose-pine
+        catppuccin.catppuccin-vsc
+        qufiwefefwoyn.kanagawa
+        sainnhe.everforest
+    )
+    for ext in "${_vscode_exts[@]}"; do
+        code --install-extension "$ext" --force &>/dev/null \
+            && ok "$ext" \
+            || warn "$ext — install failed"
+    done
+else
+    warn "VS Code CLI (code) not in PATH — skip extensions"
+fi
+
+# ── 5. btop themes ────────────────────────────────────────────────────────────
+
+step "btop themes"
+mkdir -p "$BTOP_THEMES_DIR"
+
+_btop() {
+    local name="$1" url="$2"
+    if [ -f "$BTOP_THEMES_DIR/$name.theme" ]; then
+        ok "btop/$name (already present)"
+        return
+    fi
+    curl -fsSL "$url" -o "$BTOP_THEMES_DIR/$name.theme" \
+        && ok "btop/$name" \
+        || warn "btop/$name — download failed; add $name.theme to $BTOP_THEMES_DIR manually"
+}
+
+_btop "Nord" \
+    "https://raw.githubusercontent.com/aristocratos/btop/main/themes/nord.theme"
+_btop "tokyo-night" \
+    "https://raw.githubusercontent.com/aristocratos/btop/main/themes/tokyo-night.theme"
+_btop "gruvbox" \
+    "https://raw.githubusercontent.com/aristocratos/btop/main/themes/gruvbox_dark_v2.theme"
+_btop "rose-pine" \
+    "https://raw.githubusercontent.com/rose-pine/btop/main/rose-pine.theme"
+_btop "catppuccin-frappe" \
+    "https://raw.githubusercontent.com/catppuccin/btop/main/themes/catppuccin_frappe.theme"
+_btop "everforest" \
+    "https://raw.githubusercontent.com/aristocratos/btop/main/themes/everforest-dark-hard.theme"
+
+# kanagawa has no public btop theme — write from palette
+if [ ! -f "$BTOP_THEMES_DIR/kanagawa.theme" ]; then
+    cat > "$BTOP_THEMES_DIR/kanagawa.theme" <<'THEME'
+# Kanagawa Wave btop theme
+theme[main_bg]="#1F1F28"
+theme[main_fg]="#DCD7BA"
+theme[title]="#7E9CD8"
+theme[hi_fg]="#957FB8"
+theme[selected_bg]="#2D4F67"
+theme[selected_fg]="#DCD7BA"
+theme[inactive_fg]="#54546D"
+theme[proc_misc]="#7E9CD8"
+theme[cpu_box]="#54546D"
+theme[mem_box]="#54546D"
+theme[net_box]="#54546D"
+theme[proc_box]="#54546D"
+theme[div_line]="#54546D"
+theme[temp_start]="#7E9CD8"
+theme[temp_mid]="#C0A36E"
+theme[temp_end]="#C34043"
+theme[cpu_start]="#76946A"
+theme[cpu_mid]="#C0A36E"
+theme[cpu_end]="#C34043"
+theme[free_start]="#76946A"
+theme[free_mid]="#C0A36E"
+theme[free_end]="#C34043"
+theme[cached_start]="#7E9CD8"
+theme[cached_mid]="#6A9589"
+theme[cached_end]="#DCD7BA"
+theme[available_start]="#76946A"
+theme[available_mid]="#C0A36E"
+theme[available_end]="#C34043"
+theme[used_start]="#C34043"
+theme[used_mid]="#C0A36E"
+theme[used_end]="#76946A"
+theme[download_start]="#6A9589"
+theme[download_mid]="#7E9CD8"
+theme[download_end]="#957FB8"
+theme[upload_start]="#D27E99"
+theme[upload_mid]="#957FB8"
+theme[upload_end]="#7E9CD8"
+THEME
+    ok "btop/kanagawa"
+else
+    ok "btop/kanagawa (already present)"
+fi
+
+# ── 6. yazi flavors ───────────────────────────────────────────────────────────
+
+step "yazi flavors"
+mkdir -p "$YAZI_FLAVORS_DIR"
+
+_clone_flavor() {
+    local name="$1" url="$2" subfolder="${3:-}"
+    local dest="$YAZI_FLAVORS_DIR/$name.yazi"
+    [ -d "$dest" ] && { ok "yazi/$name (already present)"; return; }
+    if [ -n "$subfolder" ]; then
+        local tmp; tmp=$(mktemp -d)
+        git clone --quiet --depth=1 "$url" "$tmp" 2>/dev/null \
+            && cp -r "$tmp/$subfolder" "$dest" \
+            && ok "yazi/$name" \
+            || warn "yazi/$name — install failed"
+        rm -rf "$tmp"
+    else
+        git clone --quiet --depth=1 "$url" "$dest" 2>/dev/null \
+            && ok "yazi/$name" \
+            || warn "yazi/$name — install failed"
+    fi
+}
+
+_clone_flavor "nord"              "https://github.com/AdithyanA2005/nord.yazi"
+_clone_flavor "tokyo-night"       "https://github.com/BennyOe/tokyo-night.yazi"
+_clone_flavor "gruvbox-dark"      "https://github.com/bennyyip/gruvbox-dark.yazi"
+_clone_flavor "rose-pine"         "https://github.com/rose-pine/yazi" "flavors/rose-pine.yazi"
+_clone_flavor "catppuccin-frappe" "https://github.com/yazi-rs/flavors" "catppuccin-frappe.yazi"
+_clone_flavor "everforest-medium" "https://github.com/Chromium-3-Oxide/everforest-medium.yazi"
+_clone_flavor "kanagawa"          "https://github.com/dangooddd/kanagawa.yazi"
+
+# ── 7. iTerm2 color presets ───────────────────────────────────────────────────
+
+step "iTerm2 color presets"
+osascript -e 'tell application "iTerm2" to true' &>/dev/null \
+    || warn "iTerm2 not running — presets may not register; re-run with iTerm2 open if needed"
+
+_iterm_exists() {
+    ITERM_CHECK_PRESET="$1" python3 <<'PYEOF' 2>/dev/null
+import subprocess, plistlib, unicodedata, os, sys
+name = unicodedata.normalize('NFC', os.environ['ITERM_CHECK_PRESET'])
+r = subprocess.run(['defaults','export','com.googlecode.iterm2','-'], capture_output=True)
+prefs = plistlib.loads(r.stdout)
+presets = prefs.get('Custom Color Presets', {})
+sys.exit(0 if any(unicodedata.normalize('NFC', k) == name for k in presets) else 1)
+PYEOF
+}
+
+_iterm_cleanup() {
+    local plist="$HOME/Library/Preferences/com.googlecode.iterm2.plist"
+    local buddy=/usr/libexec/PlistBuddy
+    for preset in "Nord" "Tokyo Night" "Gruvbox Dark Hard" "Kanagawa" "Everforest" "Rosé Pine"; do
+        for n in 2 3 4 5; do
+            "$buddy" -c "Delete 'Custom Color Presets:$preset ($n)'" "$plist" &>/dev/null \
+                && ok "iTerm2 — removed '$preset ($n)'" || true
+        done
+    done
+    "$buddy" -c "Delete 'Custom Color Presets:RosePine'" "$plist" &>/dev/null \
+        && ok "iTerm2 — removed 'RosePine'" || true
+    killall cfprefsd &>/dev/null || true
+}
+
+_iterm_cleanup
+
+_iterm() {
+    local preset="$1" url="$2" fname="$3"
+    if _iterm_exists "$preset"; then
+        ok "iTerm2/$preset (already imported)"
+        return
+    fi
+    local fpath="$ITERM_PRESETS_DIR/$fname"
+    [ -f "$fpath" ] || curl -fsSL "$url" -o "$fpath" \
+        || { warn "iTerm2/$preset — download failed"; return; }
+    open "$fpath" && sleep 2 \
+        && ok "iTerm2/$preset" \
+        || warn "iTerm2/$preset — failed; run: open '$fpath'"
+}
+
+_iterm "Nord" \
+    "https://raw.githubusercontent.com/arcticicestudio/nord-iterm2/develop/src/xml/Nord.itermcolors" \
+    "Nord.itermcolors"
+_iterm "Tokyo Night" \
+    "https://gist.githubusercontent.com/dannystewart/59a9de34206dbc67cbc468136211d048/raw/Tokyo%20Night.itermcolors" \
+    "Tokyo Night.itermcolors"
+_iterm "Gruvbox Dark Hard" \
+    "https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/Gruvbox%20Dark%20Hard.itermcolors" \
+    "Gruvbox Dark Hard.itermcolors"
+_iterm "Rosé Pine" \
+    "https://raw.githubusercontent.com/rose-pine/iterm/main/rose-pine.itermcolors" \
+    "Rosé Pine.itermcolors"
+_iterm "Catppuccin Frappe" \
+    "https://raw.githubusercontent.com/catppuccin/iterm/main/colors/catppuccin-frappe.itermcolors" \
+    "Catppuccin Frappe.itermcolors"
+_iterm "Kanagawa" \
+    "https://raw.githubusercontent.com/rebelot/kanagawa.nvim/master/extras/iterm/kanagawa.itermcolors" \
+    "Kanagawa.itermcolors"
+_iterm "Everforest" \
+    "https://raw.githubusercontent.com/mbadolato/iTerm2-Color-Schemes/master/schemes/Everforest%20Dark%20Hard.itermcolors" \
+    "Everforest.itermcolors"
+
+# ── 8. nvim colorscheme plugins ───────────────────────────────────────────────
+
+step "nvim colorscheme plugins"
+NVIM_THEMES="$HOME/.config/nvim/lua/plugins/themes.lua"
+
+if [ ! -f "$NVIM_THEMES" ]; then
+    cat > "$NVIM_THEMES" <<'LUA'
+---@type LazySpec
+return {
+  { "shaunsingh/nord.nvim",     lazy = true },
+  { "folke/tokyonight.nvim",    lazy = true },
+  { "ellisonleao/gruvbox.nvim", lazy = true },
+  { "rose-pine/neovim",         name = "rose-pine",  lazy = true },
+  { "catppuccin/nvim",          name = "catppuccin", lazy = true },
+  { "rebelot/kanagawa.nvim",    lazy = true },
+  { "sainnhe/everforest",       lazy = true },
+}
+LUA
+    ok "nvim/themes.lua created"
+else
+    ok "nvim/themes.lua (already exists)"
+fi
+
+nvim --headless -c "Lazy! sync" -c "qa" 2>/dev/null \
+    && ok "nvim plugins synced" \
+    || warn "nvim sync failed — open nvim and run :Lazy sync manually"
+
+# ── 9. Alacritty themes ───────────────────────────────────────────────────────
+
+step "Alacritty themes"
+mkdir -p "$ALACRITTY_THEMES_DIR"
+
+_alacritty_theme() {
+    local name="$1"
+    if [ -f "$ALACRITTY_THEMES_DIR/$name.toml" ]; then
+        ok "alacritty/$name (already present)"
+        return
+    fi
+    curl -fsSL \
+        "https://raw.githubusercontent.com/alacritty/alacritty-theme/master/themes/$name.toml" \
+        -o "$ALACRITTY_THEMES_DIR/$name.toml" \
+        && ok "alacritty/$name" \
+        || warn "alacritty/$name — download failed"
+}
+
+_alacritty_theme "nord"
+_alacritty_theme "tokyo_night"
+_alacritty_theme "gruvbox_dark"
+_alacritty_theme "rose_pine"
+_alacritty_theme "catppuccin_frappe"
+_alacritty_theme "kanagawa_wave"
+_alacritty_theme "everforest_dark"
+
+# ── 10. borders seed ──────────────────────────────────────────────────────────
+
+step "borders config"
+BORDERS_COLOR_FILE="$HOME/.config/borders/active_color"
+mkdir -p "$(dirname "$BORDERS_COLOR_FILE")"
+if [ -f "$BORDERS_COLOR_FILE" ]; then
+    ok "borders/active_color (already exists)"
+else
+    printf '0xff88c0d0\n' > "$BORDERS_COLOR_FILE"
+    ok "borders/active_color (seeded with Nord)"
+fi
+
+# ── done ──────────────────────────────────────────────────────────────────────
+
+printf '\n\033[1m  bootstrap complete — run ~/.config/sunshine to apply a theme\033[0m\n\n'

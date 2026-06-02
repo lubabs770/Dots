@@ -1,0 +1,3 @@
+{"type":"server-started","port":50537,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:50537","screen_dir":"/Users/<redacted>/.config/zed/themes/.superpowers/brainstorm/42124-1779920517/content","state_dir":"/Users/<redacted>/.config/zed/themes/.superpowers/brainstorm/42124-1779920517/state"}
+{"type":"screen-added","file":"/Users/<redacted>/.config/zed/themes/.superpowers/brainstorm/42124-1779920517/content/palette-vibe.html"}
+{"type":"server-stopped","reason":"owner process exited"}

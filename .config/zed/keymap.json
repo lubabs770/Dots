@@ -1,0 +1,20 @@
+[
+  {
+    "bindings": {
+      "cmd-b": "workspace::ToggleBottomDock",
+      "cmd-j": "workspace::ToggleLeftDock"
+    }
+  },
+  {
+    "bindings": {
+      "cmd-j": "project_panel::Toggle"
+    }
+  },
+  {
+    "context": "vim_mode == normal || vim_mode == visual || vim_mode == operator",
+    "bindings": {
+      "j": "vim::Up",
+      "k": "vim::Down"
+    }
+  }
+]

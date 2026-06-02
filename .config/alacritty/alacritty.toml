@@ -1,0 +1,11 @@
+[general]
+import = ["/Users/<redacted>/.config/alacritty/themes/current.toml"]
+
+[window]
+decorations = "buttonless"
+
+[font]
+size = 14.0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font Mono"

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frosted Glass Theme — Color Direction</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f14;
+    color: #e0e0f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+  h2 { font-size: 22px; font-weight: 600; margin-bottom: 6px; color: #f0f0ff; }
+  .subtitle { font-size: 14px; color: #8888aa; margin-bottom: 28px; }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1100px;
+  }
+
+  .card {
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    border: 2px solid transparent;
+    position: relative;
+  }
+  .card:hover { transform: translateY(-3px); }
+  .card.selected {
+    border-color: #7eb8f7;
+    box-shadow: 0 0 0 4px rgba(126,184,247,0.18);
+  }
+  .card.selected::after {
+    content: '✓ Selected';
+    position: absolute;
+    top: 10px; right: 10px;
+    background: #7eb8f7;
+    color: #0a0a14;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+  }
+
+  .preview {
+    height: 260px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ---- ARCTIC ---- */
+  .arctic .preview {
+    background: linear-gradient(135deg, #0d1b2e 0%, #0a1628 100%);
+  }
+  .arctic-panel {
+    position: absolute; inset: 0;
+    background: rgba(180,210,255,0.06);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .arctic-sidebar {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 140px;
+    background: rgba(140,185,240,0.08);
+    border-right: 1px solid rgba(140,185,240,0.15);
+    padding: 12px 10px;
+  }
+  .arctic-editor {
+    position: absolute; left: 140px; right: 0; top: 0; bottom: 0;
+    padding: 12px 14px;
+  }
+  .file-item {
+    font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px;
+    color: rgba(200,220,255,0.7);
+  }
+  .file-item.active { background: rgba(140,185,240,0.15); color: #b8d8ff; }
+  .tab-bar {
+    display: flex; gap: 6px; margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(140,185,240,0.12);
+  }
+  .tab { font-size: 10px; padding: 2px 8px; border-radius: 4px; color: rgba(180,210,255,0.5); }
+  .tab.active { background: rgba(140,185,240,0.15); color: #b8d8ff; }
+  .code-line { font-size: 10px; font-family: 'SF Mono', monospace; margin-bottom: 3px; line-height: 1.5; }
+
+  /* Arctic syntax */
+  .a-kw { color: #79b8ff; }
+  .a-fn { color: #b392f0; }
+  .a-str { color: #9ecbff; }
+  .a-type { color: #85e89d; }
+  .a-cm { color: #4a6075; }
+  .a-num { color: #79b8ff; }
+  .a-var { color: #e1e4e8cc; }
+  .a-dim { color: rgba(225,228,232,0.35); }
+
+  /* ---- MIDNIGHT ---- */
+  .midnight .preview {
+    background: linear-gradient(135deg, #12091e 0%, #0e0719 100%);
+  }
+  .midnight-sidebar {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 140px;
+    background: rgba(120,80,200,0.1);
+    border-right: 1px solid rgba(140,100,220,0.18);
+    padding: 12px 10px;
+  }
+  .midnight-editor {
+    position: absolute; left: 140px; right: 0; top: 0; bottom: 0;
+    padding: 12px 14px;
+  }
+  .m-file-item {
+    font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px;
+    color: rgba(200,170,255,0.6);
+  }
+  .m-file-item.active { background: rgba(140,100,220,0.18); color: #c9a0ff; }
+  .m-tab { font-size: 10px; padding: 2px 8px; border-radius: 4px; color: rgba(180,140,255,0.4); }
+  .m-tab.active { background: rgba(140,100,220,0.18); color: #c9a0ff; }
+
+  .m-kw { color: #f97583; }
+  .m-fn { color: #c9a0ff; }
+  .m-str { color: #9ecbff; }
+  .m-type { color: #79b8ff; }
+  .m-cm { color: #4b3d5e; }
+  .m-num { color: #f8c369; }
+  .m-var { color: #e1d5f0cc; }
+  .m-dim { color: rgba(225,213,240,0.3); }
+
+  /* ---- OBSIDIAN ---- */
+  .obsidian .preview {
+    background: linear-gradient(135deg, #111115 0%, #0d0d11 100%);
+  }
+  .obsidian-sidebar {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 140px;
+    background: rgba(255,255,255,0.04);
+    border-right: 1px solid rgba(255,255,255,0.07);
+    padding: 12px 10px;
+  }
+  .obsidian-editor {
+    position: absolute; left: 140px; right: 0; top: 0; bottom: 0;
+    padding: 12px 14px;
+  }
+  .o-file-item {
+    font-size: 10px; padding: 3px 6px; border-radius: 4px; margin-bottom: 2px;
+    color: rgba(220,220,230,0.55);
+  }
+  .o-file-item.active { background: rgba(255,255,255,0.08); color: #dcdce8; }
+  .o-tab { font-size: 10px; padding: 2px 8px; border-radius: 4px; color: rgba(200,200,215,0.35); }
+  .o-tab.active { background: rgba(255,255,255,0.08); color: #dcdce8; }
+
+  .o-kw { color: #ff7b72; }
+  .o-fn { color: #d2a8ff; }
+  .o-str { color: #a5d6ff; }
+  .o-type { color: #ffa657; }
+  .o-cm { color: #484850; }
+  .o-num { color: #79c0ff; }
+  .o-var { color: #c9d1d9cc; }
+  .o-dim { color: rgba(201,209,217,0.3); }
+
+  .card-body {
+    padding: 16px 18px 18px;
+  }
+  .card-body h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .card-body p { font-size: 12px; color: #8888aa; line-height: 1.5; }
+  .palette {
+    display: flex; gap: 5px; margin-top: 10px;
+  }
+  .swatch {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.1);
+  }
+
+  .arctic .card-body { background: #0d1525; }
+  .midnight .card-body { background: #110d1d; }
+  .obsidian .card-body { background: #0f0f13; }
+</style>
+<script>
+  function select(el) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const choice = el.dataset.choice;
+    const text = el.querySelector('h3').textContent;
+    if (window.__recordEvent) window.__recordEvent(choice, text);
+  }
+</script>
+</head>
+<body>
+<h2>Which vibe fits your frosted glass theme?</h2>
+<p class="subtitle">Each option shows a mini editor preview with its color palette. Click to select.</p>
+
+<div class="cards">
+
+  <!-- ARCTIC -->
+  <div class="card arctic" data-choice="arctic" onclick="select(this)">
+    <div class="preview">
+      <div class="arctic-panel"></div>
+      <div class="arctic-sidebar">
+        <div class="file-item" style="font-size:9px;color:rgba(160,190,230,0.4);margin-bottom:6px;letter-spacing:0.05em">EXPLORER</div>
+        <div class="file-item active">index.ts</div>
+        <div class="file-item">utils.ts</div>
+        <div class="file-item">styles.css</div>
+        <div class="file-item">README.md</div>
+        <div class="file-item">package.json</div>
+      </div>
+      <div class="arctic-editor">
+        <div class="tab-bar">
+          <div class="tab active">index.ts</div>
+          <div class="tab">utils.ts</div>
+        </div>
+        <div class="code-line"><span class="a-kw">import</span> <span class="a-var">{ </span><span class="a-fn">createApp</span><span class="a-var"> }</span> <span class="a-kw">from</span> <span class="a-str">'vue'</span></div>
+        <div class="code-line"><span class="a-kw">import</span> <span class="a-type">App</span> <span class="a-kw">from</span> <span class="a-str">'./App.vue'</span></div>
+        <div class="code-line a-dim">&nbsp;</div>
+        <div class="code-line"><span class="a-cm">// Initialize application</span></div>
+        <div class="code-line"><span class="a-kw">const</span> <span class="a-var">app</span> <span class="a-dim">=</span> <span class="a-fn">createApp</span><span class="a-var">(</span><span class="a-type">App</span><span class="a-var">)</span></div>
+        <div class="code-line"><span class="a-var">app</span><span class="a-dim">.</span><span class="a-fn">mount</span><span class="a-var">(</span><span class="a-str">'#app'</span><span class="a-var">)</span></div>
+        <div class="code-line a-dim">&nbsp;</div>
+        <div class="code-line"><span class="a-kw">export function</span> <span class="a-fn">init</span><span class="a-var">(</span><span class="a-type">config</span><span class="a-var">:</span> <span class="a-type">Config</span><span class="a-var">)</span> <span class="a-dim">{</span></div>
+        <div class="code-line"><span class="a-dim">&nbsp;&nbsp;return </span><span class="a-num">42</span></div>
+        <div class="code-line"><span class="a-dim">}</span></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Arctic</h3>
+      <p>Icy blue-slate tones. Clean, minimal, clinical. Feels like Windows 11 Mica — cold and precise.</p>
+      <div class="palette">
+        <div class="swatch" style="background:#0d1b2e"></div>
+        <div class="swatch" style="background:#1a2e4a"></div>
+        <div class="swatch" style="background:#79b8ff"></div>
+        <div class="swatch" style="background:#b392f0"></div>
+        <div class="swatch" style="background:#85e89d"></div>
+        <div class="swatch" style="background:#9ecbff"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIDNIGHT -->
+  <div class="card midnight" data-choice="midnight" onclick="select(this)">
+    <div class="preview">
+      <div class="midnight-sidebar">
+        <div class="m-file-item" style="font-size:9px;color:rgba(160,130,220,0.4);margin-bottom:6px;letter-spacing:0.05em">EXPLORER</div>
+        <div class="m-file-item active">index.ts</div>
+        <div class="m-file-item">utils.ts</div>
+        <div class="m-file-item">styles.css</div>
+        <div class="m-file-item">README.md</div>
+        <div class="m-file-item">package.json</div>
+      </div>
+      <div class="midnight-editor">
+        <div class="tab-bar" style="border-bottom:1px solid rgba(140,100,220,0.15)">
+          <div class="m-tab active">index.ts</div>
+          <div class="m-tab">utils.ts</div>
+        </div>
+        <div class="code-line"><span class="m-kw">import</span> <span class="m-var">{ </span><span class="m-fn">createApp</span><span class="m-var"> }</span> <span class="m-kw">from</span> <span class="m-str">'vue'</span></div>
+        <div class="code-line"><span class="m-kw">import</span> <span class="m-type">App</span> <span class="m-kw">from</span> <span class="m-str">'./App.vue'</span></div>
+        <div class="code-line m-dim">&nbsp;</div>
+        <div class="code-line"><span class="m-cm">// Initialize application</span></div>
+        <div class="code-line"><span class="m-kw">const</span> <span class="m-var">app</span> <span class="m-dim">=</span> <span class="m-fn">createApp</span><span class="m-var">(</span><span class="m-type">App</span><span class="m-var">)</span></div>
+        <div class="code-line"><span class="m-var">app</span><span class="m-dim">.</span><span class="m-fn">mount</span><span class="m-var">(</span><span class="m-str">'#app'</span><span class="m-var">)</span></div>
+        <div class="code-line m-dim">&nbsp;</div>
+        <div class="code-line"><span class="m-kw">export function</span> <span class="m-fn">init</span><span class="m-var">(</span><span class="m-type">config</span><span class="m-var">:</span> <span class="m-type">Config</span><span class="m-var">)</span> <span class="m-dim">{</span></div>
+        <div class="code-line"><span class="m-dim">&nbsp;&nbsp;return </span><span class="m-num">42</span></div>
+        <div class="code-line"><span class="m-dim">}</span></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Midnight</h3>
+      <p>Deep purple-indigo shadows. Dreamy, atmospheric. macOS Big Sur dark mode energy — warm and immersive.</p>
+      <div class="palette">
+        <div class="swatch" style="background:#12091e"></div>
+        <div class="swatch" style="background:#1e1030"></div>
+        <div class="swatch" style="background:#c9a0ff"></div>
+        <div class="swatch" style="background:#f97583"></div>
+        <div class="swatch" style="background:#79b8ff"></div>
+        <div class="swatch" style="background:#f8c369"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBSIDIAN -->
+  <div class="card obsidian" data-choice="obsidian" onclick="select(this)">
+    <div class="preview">
+      <div class="obsidian-sidebar">
+        <div class="o-file-item" style="font-size:9px;color:rgba(200,200,215,0.3);margin-bottom:6px;letter-spacing:0.05em">EXPLORER</div>
+        <div class="o-file-item active">index.ts</div>
+        <div class="o-file-item">utils.ts</div>
+        <div class="o-file-item">styles.css</div>
+        <div class="o-file-item">README.md</div>
+        <div class="o-file-item">package.json</div>
+      </div>
+      <div class="obsidian-editor">
+        <div class="tab-bar" style="border-bottom:1px solid rgba(255,255,255,0.07)">
+          <div class="o-tab active">index.ts</div>
+          <div class="o-tab">utils.ts</div>
+        </div>
+        <div class="code-line"><span class="o-kw">import</span> <span class="o-var">{ </span><span class="o-fn">createApp</span><span class="o-var"> }</span> <span class="o-kw">from</span> <span class="o-str">'vue'</span></div>
+        <div class="code-line"><span class="o-kw">import</span> <span class="o-type">App</span> <span class="o-kw">from</span> <span class="o-str">'./App.vue'</span></div>
+        <div class="code-line o-dim">&nbsp;</div>
+        <div class="code-line"><span class="o-cm">// Initialize application</span></div>
+        <div class="code-line"><span class="o-kw">const</span> <span class="o-var">app</span> <span class="o-dim">=</span> <span class="o-fn">createApp</span><span class="o-var">(</span><span class="o-type">App</span><span class="o-var">)</span></div>
+        <div class="code-line"><span class="o-var">app</span><span class="o-dim">.</span><span class="o-fn">mount</span><span class="o-var">(</span><span class="o-str">'#app'</span><span class="o-var">)</span></div>
+        <div class="code-line o-dim">&nbsp;</div>
+        <div class="code-line"><span class="o-kw">export function</span> <span class="o-fn">init</span><span class="o-var">(</span><span class="o-type">config</span><span class="o-var">:</span> <span class="o-type">Config</span><span class="o-var">)</span> <span class="o-dim">{</span></div>
+        <div class="code-line"><span class="o-dim">&nbsp;&nbsp;return </span><span class="o-num">42</span></div>
+        <div class="code-line"><span class="o-dim">}</span></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>Obsidian</h3>
+      <p>Near-black glass with neutral-warm grays. GitHub-adjacent syntax. Subtle, serious, no-nonsense.</p>
+      <div class="palette">
+        <div class="swatch" style="background:#111115"></div>
+        <div class="swatch" style="background:#1a1a20"></div>
+        <div class="swatch" style="background:#d2a8ff"></div>
+        <div class="swatch" style="background:#ff7b72"></div>
+        <div class="swatch" style="background:#a5d6ff"></div>
+        <div class="swatch" style="background:#ffa657"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

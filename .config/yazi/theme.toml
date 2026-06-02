@@ -1,0 +1,8 @@
+# Fixes rounded corners in iTerm2. See: https://github.com/sxyazi/yazi/pull/3419
+# Also requires: Settings → Profiles → Text → "Use built-in Powerline glyphs"
+#                Settings → Profiles → Window → "Keep background colors opaque"
+[indicator]
+padding = { open = "█", close = "█" }
+
+[flavor]
+use = "catppuccin-frappe"

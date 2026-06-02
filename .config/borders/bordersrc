@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+# Source active color if set, otherwise use default
+color_file="$HOME/.config/borders/active_color"
+if [ -f "$color_file" ]; then
+    active_color=$(cat "$color_file")
+else
+    active_color="0xff5599ff"  # default blue
+fi
+
+options=(
+    style=round
+    width=8.0
+    hidpi=on
+    active_color="$active_color"
+    inactive_color=0x00000000
+)
+
+borders "${options[@]}"
