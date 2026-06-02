@@ -13,14 +13,18 @@ curl -fsSL https://raw.githubusercontent.com/lubabs770/Dots/main/install.sh | ba
 The installer:
 
 1. Ensures `git` and Homebrew are present (installs Homebrew if missing).
-2. Clones this repo to a temp dir.
-3. Copies the dotfiles into `$HOME`, backing up anything it would overwrite to
-   `~/.dotfiles-backup/<timestamp>/`.
-4. Restores VS Code settings/keybindings and installs the listed extensions
-   (if the `code` CLI is on your PATH).
-5. Runs `brew bundle` against the bundled `Brewfile`.
 
-Restart your shell (`exec zsh`) when it finishes.
+3. Clones this repo to a temp dir.
+
+5. Copies the dotfiles into `$HOME`, backing up anything it would overwrite to
+   `~/.dotfiles-backup/<timestamp>/`.
+   
+6. Restores VS Code settings/keybindings and installs the listed extensions
+   (if the `code` CLI is on your PATH).
+   
+7. Runs `brew bundle` against the bundled `Brewfile`.
+
+8. Restart your shell (`exec zsh`) when it finishes.
 
 ## Notes
 
@@ -31,10 +35,14 @@ Restart your shell (`exec zsh`) when it finishes.
   and `.config/.mono/`. The installer still places them (and warns when it does) —
   you must fill in real values manually afterward, e.g. re-auth `gh`, re-link
   Linear, and rebuild your Finicky config.
+
+  
 - **Empty submodule dirs.** The yazi flavors (`everforest-medium`, `gruvbox-dark`,
   `kanagawa`, `nord`, `tokyo-night`) and the `aphrodite` zsh theme are stored as
   bare submodule references with no content, so they are not restored. The
   installer reports them at the end; clone them from their upstreams if needed.
+
+  
 
 ## Structure
 
